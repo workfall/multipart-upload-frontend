@@ -81,7 +81,7 @@ export class Uploader {
       }
 
       const urlsResponse = await api.request({
-        url: "/get-signed-urls",
+        url: "/get-presigned-url",
         method: "POST",
         data: AWSMultipartFileDataInput,
       })
