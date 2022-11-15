@@ -87,11 +87,14 @@ export class Uploader {
       })
       
 
-      const newParts: any = {
-        signedUrl: urlsResponse.data,
-        PartNumber: this.parts.length + 1
+      const newParts: any[] = [];
+      for (let i = 0; i < numberOfparts; i++) {
+        newParts.push({
+          signedUrl: urlsResponse.data,
+          PartNumber: i + 1
+        })
       }
-      this.parts.push(newParts)
+      this.parts.push(...newParts)
 
       this.sendNext()
     } catch (error) {
@@ -101,6 +104,8 @@ export class Uploader {
 
   sendNext() {
     const activeConnections = Object.keys(this.activeConnections).length
+    console.log('this.parts', this.parts);
+    
 
     if (activeConnections >= this.threadsQuantity) {
       return
