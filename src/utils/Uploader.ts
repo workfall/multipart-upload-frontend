@@ -68,15 +68,15 @@ export class Uploader {
 
       const AWSFileDataOutput = initializeReponse.data
 
-      this.fileId = AWSFileDataOutput.fileId
-      this.fileKey = AWSFileDataOutput.fileKey
+      this.fileId = AWSFileDataOutput.UploadId
+      this.fileKey = AWSFileDataOutput.Key
 
       // retrieving the pre-signed URLs
       const numberOfparts = Math.ceil(this.file.size / this.chunkSize)
 
       const AWSMultipartFileDataInput = {
-        fileId: this.fileId,
-        fileKey: this.fileKey,
+        uploadId: this.fileId,
+        name: this.fileKey,
         parts: numberOfparts,
       }
 
@@ -85,9 +85,13 @@ export class Uploader {
         method: "POST",
         data: AWSMultipartFileDataInput,
       })
+      
 
-      const newParts: any[] = urlsResponse.data.parts
-      this.parts.push(...newParts)
+      const newParts: any = {
+        signedUrl: urlsResponse.data,
+        PartNumber: this.parts.length + 1
+      }
+      this.parts.push(newParts)
 
       this.sendNext()
     } catch (error) {
@@ -111,6 +115,7 @@ export class Uploader {
     }
 
     const part: any = this.parts.pop()
+    
     if (this.file && part) {
       const sentSize = (part.PartNumber - 1) * this.chunkSize
       const chunk = this.file.slice(sentSize, sentSize + this.chunkSize)
@@ -155,8 +160,8 @@ export class Uploader {
   async sendCompleteRequest() {
     if (this.fileId && this.fileKey) {
       const videoFinalizationMultiPartInput = {
-        fileId: this.fileId,
-        fileKey: this.fileKey,
+        UploadId: this.fileId,
+        Key: this.fileKey,
         parts: this.uploadedParts,
       }
 
@@ -172,6 +177,8 @@ export class Uploader {
     return new Promise((resolve, reject) => {
       this.upload(chunk, part, sendChunkStarted)
         .then((status) => {
+          console.log('status', status);
+          
           if (status !== 200) {
             reject(new Error("Failed chunk upload"))
             return

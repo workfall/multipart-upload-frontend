@@ -4,23 +4,24 @@ import FileUpload from './components/FileUploadComponent';
 import { Uploader } from "./utils/Uploader"
 
 function App() {
-  const [formData, setFormData] = useState(new FormData());
   const [file, setFile] = useState<any>(undefined)
   const [uploader, setUploader] = useState<any>(undefined)
+  const [progress, setProgress] = useState(0)
 
   const handleFileSelect = (files: FileList | null) => {
     if (files) {
-      formData.set('file', files[0]);
+      setFile(files[0])
     }
-    setFormData(formData);
   }
 
   const uploadFile = () => {
     if (file) {
+      console.log(file);
+      
       let percentage: any = undefined
 
      const videoUploaderOptions = {
-        fileName: "foo",
+        fileName: file.name,
         file: file,
       }
       const uploader = new Uploader(videoUploaderOptions)
@@ -31,7 +32,8 @@ function App() {
           // to avoid the same percentage to be logged twice
           if (newPercentage !== percentage) {
             percentage = newPercentage
-            console.log(`${percentage}%`)
+            setProgress(percentage)
+            console.log('percentage', `${percentage}%`)
           }
         })
         .onError((error: any) => {
@@ -41,18 +43,6 @@ function App() {
 
       uploader.start()
     }
-    // try {
-    //   Axios({
-    //     method: 'POST',
-    //     url: 'http://localhost:3001/upload-file',
-    //     headers: {
-    //       'Content-Type': 'multipart/form-data'
-    //     },
-    //     data: formData
-    //   });
-    // } catch (error) {
-    //   console.log(error);
-    // }
   }
 
   const cancelUpload = () => {
@@ -67,6 +57,8 @@ function App() {
       <h1>Simple File Upload Form</h1>
       <FileUpload handleOnselect={handleFileSelect} />
       <button onClick={uploadFile}>Upload</button>
+      <br />
+      <p>Progress: {progress} %</p>
       <br />
       <button onClick={cancelUpload}>Cancel</button>
     </div>
