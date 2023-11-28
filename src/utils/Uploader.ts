@@ -1,8 +1,12 @@
 import axios from "axios"
 
+console.log(process.env?.REACT_APP_API_KEY);
 // initializing axios
 const api = axios.create({
-  baseURL: "http://localhost:3001",
+  baseURL: "http://localhost:3000",
+  headers: {
+    "x-api-key": process.env.REACT_APP_API_KEY ?? ''
+  }
 })
 
 // original source: https://github.com/pilovm/multithreaded-uploader/blob/master/frontend/uploader.js
@@ -61,7 +65,7 @@ export class Uploader {
         name: fileName,
       }
       const initializeReponse = await api.request({
-        url: "/create-multipart",
+        url: "biopsies/upload/create-multipart",
         method: "POST",
         data: videoInitializationUploadInput,
       })
@@ -81,7 +85,7 @@ export class Uploader {
       }
 
       const urlsResponse = await api.request({
-        url: "/get-presigned-url",
+        url: "biopsies/upload/get-presigned-urls",
         method: "POST",
         data: AWSMultipartFileDataInput,
       })
@@ -171,7 +175,7 @@ export class Uploader {
       }
 
       await api.request({
-        url: "/complete-multipart",
+        url: "biopsies/upload/complete-multipart",
         method: "POST",
         data: videoFinalizationMultiPartInput,
       })
