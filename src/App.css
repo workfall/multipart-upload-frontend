@@ -1,4 +1,47 @@
 .App {
   text-align: center;
   padding-top: 2%;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 50px;
+  padding: 50px;
+}
+
+.fileInputs {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 50px;
+}
+
+.fileInput {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: flex-start;
+  gap: 5px;
+}
+
+.fileInput .title {
+  text-decoration: underline;
+}
+
+.fileInput .uploadProgress {
+  display: flex;
+  flex-direction: row;
+  gap: 20px;
+  align-items: center;
+}
+
+.fileInput .rawInput {
+  min-width: 400px;
+}
+
+
+.fileInput .objectKey {
+  text-align: left;
+  text-wrap: wrap;
 }

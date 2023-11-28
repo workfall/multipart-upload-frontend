@@ -1,66 +1,109 @@
-import React, { useState } from 'react';
-import './App.css';
-import FileUpload from './components/FileUploadComponent';
-import { Uploader } from "./utils/Uploader"
+import React, { useState } from "react";
+import "./App.css";
+import FileUpload from "./components/FileUploadComponent";
+import { Uploader } from "./utils/Uploader";
 
 function App() {
-  const [file, setFile] = useState<any>(undefined)
-  const [uploader, setUploader] = useState<any>(undefined)
-  const [progress, setProgress] = useState(0)
+  const [file, setFile] = useState<any>(undefined);
+  const [uploader, setUploader] = useState<any>(undefined);
+  const [progress, setProgress] = useState(0);
+  const [apiBaseUrl, setApiBaseUrl] = useState<string>(
+    process.env.REACT_APP_API_BASE_URL ?? ""
+  );
+  const [objectKey, setObjectKey] = useState<string>("");
+
+  const handleApiBaseUrlChange = (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    setApiBaseUrl(event.target.value);
+  };
 
   const handleFileSelect = (files: FileList | null) => {
     if (files) {
-      setFile(files[0])
+      setFile(files[0]);
     }
-  }
+  };
 
   const uploadFile = () => {
     if (file) {
       console.log(file);
-      
-      let percentage: any = undefined
 
-     const videoUploaderOptions = {
+      let percentage: any = undefined;
+
+      const videoUploaderOptions = {
         fileName: file.name,
         file: file,
-      }
-      const uploader = new Uploader(videoUploaderOptions)
-      setUploader(uploader)
+        apiBaseUrl: apiBaseUrl,
+      };
+      const uploader = new Uploader(videoUploaderOptions);
+      setUploader(uploader);
 
       uploader
         .onProgress(({ percentage: newPercentage }: any) => {
           // to avoid the same percentage to be logged twice
           if (newPercentage !== percentage) {
-            percentage = newPercentage
-            setProgress(percentage)
-            console.log('percentage', `${percentage}%`)
+            percentage = newPercentage;
+            setProgress(percentage);
+            console.log("percentage", `${percentage}%`);
           }
         })
         .onError((error: any) => {
-          setFile(undefined)
-          console.error(error)
+          setFile(undefined);
+          console.error(error);
         })
+        .onCompleted((newObjectKey: string) => {
+          setObjectKey(newObjectKey);
+          console.log("newObjectKey", newObjectKey);
+        });
 
-      uploader.start()
+      uploader.start();
     }
-  }
+  };
 
   const cancelUpload = () => {
     if (uploader) {
-      uploader.abort()
-      setFile(undefined)
+      uploader.abort();
+      setFile(undefined);
+      setObjectKey("");
     }
-  }
+  };
 
   return (
     <div className="App">
-      <h1>Simple File Upload Form</h1>
-      <FileUpload handleOnselect={handleFileSelect} />
-      <button onClick={uploadFile}>Upload</button>
-      <br />
-      <p>Progress: {progress} %</p>
-      <br />
-      <button onClick={cancelUpload}>Cancel</button>
+      <h1>PoC MSInsight - File Upload Form</h1>
+      <div className="api-url-input">
+        <span>API Base URL: </span>
+        <input
+          type="text"
+          value={apiBaseUrl}
+          onChange={handleApiBaseUrlChange}
+        />
+      </div>
+
+      <div className="fileInputs">
+        <div className="fileInput">
+          <h3 className="title">Normal R1:</h3>
+          <div className="uploadProgress">
+            <FileUpload
+              className="rawInput"
+              handleOnselect={handleFileSelect}
+            />
+            <p>Upload Progress: {progress} %</p>
+          </div>
+          <label className="objectKey">
+            File key in the datalake: {objectKey}
+          </label>
+        </div>
+      </div>
+      <div className="controls">
+        <button
+          disabled={file === undefined || progress > 0 || apiBaseUrl === ""}
+          onClick={uploadFile}
+        >
+          Upload
+        </button>
+        <button onClick={cancelUpload}>Cancel</button>
+      </div>
     </div>
   );
 }
