@@ -7,7 +7,6 @@ export class Uploader {
   chunkSize: any;
   threadsQuantity: number;
   file: any;
-  fileName: any;
   aborted: boolean;
   uploadedSize: number;
   progressCache: any;
@@ -28,7 +27,6 @@ export class Uploader {
     // number of parallel uploads
     this.threadsQuantity = Math.min(options.threadsQuantity || 5, 15);
     this.file = options.file;
-    this.fileName = options.fileName;
     this.aborted = false;
     this.uploadedSize = 0;
     this.progressCache = {};
@@ -45,7 +43,7 @@ export class Uploader {
     this.api = axios.create({
       baseURL: options.apiBaseUrl || "http://localhost:XXXX",
       headers: {
-        "x-api-key": process.env.REACT_APP_API_KEY ?? "",
+        "x-api-key": options.apiKey ?? "",
         "Content-Type": "application/json",
       },
     });
@@ -65,15 +63,8 @@ export class Uploader {
 
   async initialize() {
     try {
-      // adding the the file extension (if present) to fileName
-      let fileName = this.fileName;
-      const ext = this.file.name.split(".").pop();
-      if (ext) {
-        fileName += `.${ext}`;
-      }
-
       const payload = {
-        NormalR1FileName: fileName,
+        NormalR1FileName: this.file.name,
         NormalR1FileSize: this.file.size,
       };
       const urlsResponse = await this.api.request({

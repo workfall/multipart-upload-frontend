@@ -10,12 +10,17 @@ function App() {
   const [apiBaseUrl, setApiBaseUrl] = useState<string>(
     process.env.REACT_APP_API_BASE_URL ?? ""
   );
+  const [apiKey, setApiKey] = useState<string>("");
   const [objectKey, setObjectKey] = useState<string>("");
 
   const handleApiBaseUrlChange = (
     event: React.ChangeEvent<HTMLInputElement>
   ) => {
     setApiBaseUrl(event.target.value);
+  };
+
+  const handleApiKeyChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setApiKey(event.target.value);
   };
 
   const handleFileSelect = (files: FileList | null) => {
@@ -31,9 +36,9 @@ function App() {
       let percentage: any = undefined;
 
       const videoUploaderOptions = {
-        fileName: file.name,
         file: file,
         apiBaseUrl: apiBaseUrl,
+        apiKey: apiKey,
       };
       const uploader = new Uploader(videoUploaderOptions);
       setUploader(uploader);
@@ -63,21 +68,28 @@ function App() {
   const cancelUpload = () => {
     if (uploader) {
       uploader.abort();
-      setFile(undefined);
-      setObjectKey("");
     }
+    setFile(undefined);
+    setObjectKey("");
+    setProgress(0);
   };
 
   return (
     <div className="App">
       <h1>PoC MSInsight - File Upload Form</h1>
-      <div className="api-url-input">
-        <span>API Base URL: </span>
-        <input
-          type="text"
-          value={apiBaseUrl}
-          onChange={handleApiBaseUrlChange}
-        />
+      <div className="apiSettings">
+        <div className="url">
+          <span>API Base URL: </span>
+          <input
+            type="text"
+            value={apiBaseUrl}
+            onChange={handleApiBaseUrlChange}
+          />
+        </div>
+        <div className="key">
+          <span>API Key: </span>
+          <input type="password" value={apiKey} onChange={handleApiKeyChange} />
+        </div>
       </div>
 
       <div className="fileInputs">
@@ -88,7 +100,7 @@ function App() {
               className="rawInput"
               handleOnselect={handleFileSelect}
             />
-            <p>Upload Progress: {progress} %</p>
+            <p>Upload Progress: {progress === 0 ? "" : `${progress} %`}</p>
           </div>
           <label className="objectKey">
             File key in the datalake: {objectKey}
@@ -97,7 +109,12 @@ function App() {
       </div>
       <div className="controls">
         <button
-          disabled={file === undefined || progress > 0 || apiBaseUrl === ""}
+          disabled={
+            file === undefined ||
+            progress > 0 ||
+            apiBaseUrl === "" ||
+            apiKey === ""
+          }
           onClick={uploadFile}
         >
           Upload
