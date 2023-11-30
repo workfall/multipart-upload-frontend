@@ -16,6 +16,8 @@ export class Uploader {
   fileId: null;
   fileKey: null;
   api: any;
+  patientId: any;
+  laboratoryId:any
   onProgressFn: (err: any) => void;
   onErrorFn: (err: any) => void;
   onCompletedFn: (objectKey: string) => void;
@@ -38,6 +40,8 @@ export class Uploader {
     this.onProgressFn = () => {};
     this.onErrorFn = () => {};
     this.onCompletedFn = () => {};
+    this.patientId = options.patientId;
+    this.laboratoryId = options.laboratoryId
 
     // initializing axios
     this.api = axios.create({
@@ -64,8 +68,10 @@ export class Uploader {
   async initialize() {
     try {
       const payload = {
-        NormalR1FileName: this.file.name,
-        NormalR1FileSize: this.file.size,
+        normalR1FileName: this.file.name,
+        normalR1FileSize: this.file.size,
+        laboratoryId: this.laboratoryId,
+        patientId: this.patientId
       };
       const urlsResponse = await this.api.request({
         url: "biopsies/upload/get-presigned-urls",

@@ -12,6 +12,9 @@ function App() {
   );
   const [apiKey, setApiKey] = useState<string>("");
   const [objectKey, setObjectKey] = useState<string>("");
+  const [patientId, setPatientId] = useState<string>("");
+  const [laboratoryId, setLaboratoryId] = useState<string>("");
+
 
   const handleApiBaseUrlChange = (
     event: React.ChangeEvent<HTMLInputElement>
@@ -22,6 +25,15 @@ function App() {
   const handleApiKeyChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setApiKey(event.target.value);
   };
+  const handlePatientIdChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setPatientId(event.target.value);
+  };
+  const handleLaboratoryIdChange = (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    setLaboratoryId(event.target.value);
+  };
+
 
   const handleFileSelect = (files: FileList | null) => {
     if (files) {
@@ -39,6 +51,8 @@ function App() {
         file: file,
         apiBaseUrl: apiBaseUrl,
         apiKey: apiKey,
+        patientId: patientId,
+        laboratoryId: laboratoryId
       };
       const uploader = new Uploader(videoUploaderOptions);
       setUploader(uploader);
@@ -90,6 +104,14 @@ function App() {
           <span>API Key: </span>
           <input type="password" value={apiKey} onChange={handleApiKeyChange} />
         </div>
+      <div className="laboratoryId">
+          <span>Laboratory ID: </span>
+          <input type="text" value={laboratoryId} onChange={handleLaboratoryIdChange} />
+        </div>
+      <div className="patientId">
+          <span>Patient ID: </span>
+          <input type="text" value={patientId} onChange={handlePatientIdChange} />
+        </div>
       </div>
 
       <div className="fileInputs">
@@ -113,7 +135,7 @@ function App() {
             file === undefined ||
             progress > 0 ||
             apiBaseUrl === "" ||
-            apiKey === ""
+            apiKey === "" || patientId === ""|| laboratoryId === ""
           }
           onClick={uploadFile}
         >
